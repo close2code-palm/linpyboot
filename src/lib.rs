@@ -27,12 +27,14 @@ fn reboot(mode: i64) -> PyResult<()> {
                 ))
             }
         };
-        sys::reboot::reboot(reboot_mode).unwrap();
+        if let Err(_inf) = sys::reboot::reboot(reboot_mode) {
+            return Err(PermissionError::new_err("Capability is not set."))
+        }
     }
     Ok(())
 }
 
-fn handle_reboot_execution<T>(execution: Result<(), T>) -> PyResult<()> {
+fn handle_reboot_execution(execution: Result<(), Errno>) -> PyResult<()> {
     return match execution {
         Ok(_) => Ok(()),
         Err(err) => match err {
