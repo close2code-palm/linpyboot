@@ -5,14 +5,11 @@ use pyo3::{Bound, pyfunction, pymodule, PyResult, wrap_pyfunction};
 use pyo3::prelude::PyModule;
 
 #[pyfunction]
-// #[cfg(target_os="linux")]
 fn reboot(mode: i64) -> PyResult<()> {
     if mode as i32 == RB_DISABLE_CAD {
-        // sys::reboot::set_cad_enabled(false)?;
-        println!("CAD dis")
+        sys::reboot::set_cad_enabled(false)?;
     } else if mode as u32 as i32 == RB_ENABLE_CAD {
-        // sys::reboot::set_cad_enabled(true)?;
-        println!("CAD enabled")
+        sys::reboot::set_cad_enabled(true)?;
     } else {
         let reboot_mode = match mode as u32 {
             0xcdef0123u32 => RebootMode::RB_HALT_SYSTEM,
@@ -21,9 +18,8 @@ fn reboot(mode: i64) -> PyResult<()> {
             0xd000fce2u32 => RebootMode::RB_SW_SUSPEND,
             _ => RebootMode::RB_AUTOBOOT,
         };
-        println!("{reboot_mode}");
+        sys::reboot::reboot(reboot_mode).unwrap();
     }
-    // sys::reboot::reboot(reboot_mode).unwrap();
     Ok(())
 }
 
